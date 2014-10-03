@@ -53,7 +53,10 @@ parser = OptionParser.new do |opts|
   opts.on('--fim', 'FIM scan (requires active baseline)') do |fim|
     options[:fim] = {:scan => {:module => "fim"}}
   end
-  msg = "usage: scan_active_srvs.rb [ --sva | --csm | --sam | --fim ]"
+  opts.on('--group ', 'Filter active servers by group_name (partial matches)') do |group|
+   options[:group] = URI.encode("&group_name=#{group}")
+  end
+  msg = "usage: scan_active_srvs.rb [ --sva | --csm | --sam | --fim ][--group=\"Group Name\"]"
   opts.on('-h', '--help', msg) do
     puts opts
     exit
@@ -89,7 +92,6 @@ parser.parse!
 # export HALO_API_KEY_FILE
 begin
   api_keys = YAML.load_file("#{ENV['HALO_API_KEY_FILE']}")
-  srv_counts = Hash.new()
 rescue => e
   puts "[ERROR] loading api_keys"
   puts e
@@ -105,23 +107,31 @@ api_keys.each do |acct, attrs|
   @api = API.new(attrs['key_id'], attrs['secret_key'], attrs['grid'])
 
   # search for active servers
-  resp = @api.get("/servers?state=active")
+  if options[:group].nil?
+    resp = @api.get("/servers?state=active")
+  else
+    resp = @api.get("/servers?state=active#{options[:group]}")
+  end
+
   data = JSON.parse(resp)
 
   # iterate through each server, and launch the scan 
   scan_type = nil
   body = nil
   options.each do |o|
-    scan_type = o[0]
-    body = o[1]
+    # skip group, since it's not a scan type
+    unless o[0].to_s == "group"
+      scan_type = o[0]
+      body = o[1]
 
-    data['servers'].each do |srv|
-      r = @api.post("/servers/#{srv['id']}/scans", body)
-      if r.code == 202
-        puts "[INFO] successfully launched #{scan_type} against #{srv['hostname']}:#{srv['connecting_ip_address']}"
-      else
-        puts "[WARNING] #{scan_type} against #{srv['hostname']}:#{srv['connecting_ip_address']} had a issue. Returned: #{r.code}"
-        puts "[WARNING] #{r}"
+      data['servers'].each do |srv|
+        r = @api.post("/servers/#{srv['id']}/scans", body)
+        if r.code == 202
+          puts "[INFO] successfully launched #{scan_type} against #{srv['hostname']}:#{srv['connecting_ip_address']}"
+        else
+          puts "[WARNING] #{scan_type} against #{srv['hostname']}:#{srv['connecting_ip_address']} had a issue. Returned: #{r.code}"
+          puts "[WARNING] #{r}"
+        end
       end
     end
   end
