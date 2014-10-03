@@ -4,7 +4,7 @@ Version: *1.0*
 <br />
 Author: *Eric Hoffmann* - *ehoffmann@cloudpassage.com*
 
-Users can use the provided example script to initiate a scan against all active servers. It uses the Halo API to launch the scan, using the cmdline option to specify which type of scan. Supported types are:
+Users can use the provided example script to initiate a scan against all active servers or active servers in a specified Server Group. It uses the Halo API to launch the scan, using the cmdline option to specify which type of scan. Supported types are:
 * SVA - Software Vulnerability Assessement
 * CSM - Configuration Security Monitoring
 * SAM - Server Account Management
@@ -48,8 +48,20 @@ export HALO_API_KEY_FILE
 
 How to excute the script
 ```
-ruby scan_all_servers.rb --sva
+ruby scan_all_servers.rb --sva --group="Web Servers"
 [INFO] successfully launched sva against docker-ubuntu-ec2:52.211.9.65
 [INFO] successfully launched sva against docker-ubuntu1404-ec2:52.212.2.159
 ...
+```
+
+Help
+```
+ruby scan_all_servers.rb --help
+Usage: scan_all_servers [options]
+        --sva                        SVA scan
+        --csm                        CSM scan
+        --sam                        SAM scan
+        --fim                        FIM scan (requires active baseline)
+        --group                      Filter active servers by group_name (partial matches)
+    -h, --help                       usage: scan_active_srvs.rb [ --sva | --csm | --sam | --fim ][--group="Group Name"]
 ```
