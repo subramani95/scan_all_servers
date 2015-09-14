@@ -65,3 +65,7 @@ Usage: scan_all_servers [options]
         --group                      Filter active servers by group_name (partial matches)
     -h, --help                       usage: scan_active_srvs.rb [ --sva | --csm | --sam | --fim ][--group="Group Name"]
 ```
+
+<!---
+#CPTAGS:community-unsupported audit automation
+-->
