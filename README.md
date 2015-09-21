@@ -68,4 +68,5 @@ Usage: scan_all_servers [options]
 
 <!---
 #CPTAGS:community-unsupported audit automation
+#TBICON:images/ruby_icon.png
 -->
