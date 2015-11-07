@@ -2,4 +2,4 @@ source 'https://rubygems.org'
 
 gem 'json'
 gem 'rest-client'
-gem 'oauth'
+gem 'oauth2'
