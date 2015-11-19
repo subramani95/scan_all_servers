@@ -11,6 +11,7 @@ require 'json'
 require 'yaml'
 
 require './lib/api_helper'
+require './lib/account_manager'
 
 # pass in scan type
 options = {}
@@ -38,39 +39,9 @@ parser = OptionParser.new do |opts|
 end
 parser.parse!
 
-# setup the account specific API-Client key/secret and
-# save these in a dot file like ~/.halo Reference the
-# location as a ENV param instead of "hardcoding"
-# them into this script (which may end up in a repo
-# by mistake)
-#
-# the format of the yaml file ie ~/.halo
-# halo-acct1:
-#   key_id : XXXXXXX1
-#   secret_key : XXXXXXXXXXXXXXXXXXXXXXXXXX1
-#
-# optionally, add a second, third etc. acct key/secret
-# halo-acct2:
-#   key_id : XXXXXXX2
-#   secret_key : XXXXXXXXXXXXXXXXXXXXXXXXXX2
-#
-# and adding an additional grid param is supported as well
-# halo-acct3:
-#   key_id : XXXXXXX3
-#   secret_key : XXXXXXXXXXXXXXXXXXXXXXXXXX3
-#   grid : api.<unique>.cloudpassage.com
-#
-# don't forget to add and export HALO_API_KEY_FILE
-# in your ~/.bash_profile Should look something like
-# HALO_API_KEY_FILE="/home/ehoffmann/.halo"
-# export HALO_API_KEY_FILE
-begin
-  api_keys = YAML.load_file("#{ENV['HALO_API_KEY_FILE']}")
-rescue => e
-  puts '[ERROR] loading api_keys'
-  puts e
-  exit
-end
+# Ensure HALO_API_KEY_FILE environment is pointing at a valid configuration
+# file. See lib/account_manager.rb for details.
+api_keys = AccountManager.new.api_keys
 
 # loop through each acct
 api_keys.each do |_acct, attrs|
