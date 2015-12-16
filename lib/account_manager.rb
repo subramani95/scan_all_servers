@@ -1,3 +1,5 @@
+require 'yaml'
+
 # setup the account specific API-Client key/secret and
 # save these in a dot file like ~/.halo Reference the
 # location as a ENV param instead of "hardcoding"
@@ -24,6 +26,9 @@
 # in your ~/.bash_profile Should look something like
 # HALO_API_KEY_FILE="/home/ehoffmann/.halo"
 # export HALO_API_KEY_FILE
+#
+# Alternatively, set the environment variables for
+# HALO_ID and HALO_SECRET_KEY.
 
 class AccountManager
   attr_reader :api_keys
@@ -36,8 +41,19 @@ class AccountManager
     @api_keys ||= load_accounts
   end
 
+  def load_from_environment
+    raise "[ERROR] loading api_keys: #{e}" and exit if ENV['HALO_ID'].nil? && ENV['HALO_SECRET_KEY'].nil?
+    {
+      'halo' => {
+        'key_id' => ENV['HALO_ID'],
+        'secret_key' => ENV['HALO_SECRET_KEY'],
+        'grid' => ENV['HALO_GRID']
+      }
+    }
+  end
+
   def load_accounts
-    YAML.load_file(@config_file)
+    @config_file.nil? ? load_from_environment : YAML.load_file(@config_file)
   rescue => e
     raise "[ERROR] loading api_keys: #{e}" and exit
   end
