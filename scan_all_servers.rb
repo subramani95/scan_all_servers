@@ -49,7 +49,7 @@ api_keys.each do |_acct, attrs|
   @api = ApiHelper.new(attrs['key_id'], attrs['secret_key'], attrs['grid'])
 
   # search for active servers
-  if group = options.delete(:group).nil?
+  if (group = options.delete(:group)).nil?
     resp = @api.get('/servers?state=active')
   else
     resp = @api.get("/servers?state=active#{group}")
