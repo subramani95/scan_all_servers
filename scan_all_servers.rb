@@ -47,14 +47,7 @@ api_keys = AccountManager.new.api_keys
 api_keys.each do |_acct, attrs|
   attrs['grid'] = 'api.cloudpassage.com' if attrs['grid'].nil? # set a default
   @api = ApiHelper.new(attrs['key_id'], attrs['secret_key'], attrs['grid'])
-
-  # search for active servers
-  if group = options.delete(:group).nil?
-    resp = @api.get('/servers?state=active')
-  else
-    resp = @api.get("/servers?state=active#{group}")
-  end
-
+  resp = options[:group].nil? ? @api.get('/servers?state=active') : @api.get("/servers?state=active#{options[:group]}")
   data = JSON.parse(resp)
   options.each do |scan_type, body|
     data['servers'].each do |server|
