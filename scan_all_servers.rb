@@ -50,6 +50,7 @@ api_keys.each do |_acct, attrs|
   resp = options[:group].nil? ? @api.get('/servers?state=active') : @api.get("/servers?state=active#{options[:group]}")
   data = JSON.parse(resp)
   options.each do |scan_type, body|
+    next if scan_type == :group
     data['servers'].each do |server|
       r = @api.post("/servers/#{server['id']}/scans", body)
       if r.code == 202
